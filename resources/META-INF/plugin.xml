@@ -1,0 +1,42 @@
+<idea-plugin>
+  <id>com.github.xwsg</id>
+  <name>PlantUML2DDL</name>
+  <version>1.0</version>
+  <vendor email="xtremaplux@gmail.com" url="http://www.github.com/xwsg">Xwsg</vendor>
+
+  <description><![CDATA[
+      Generate DDL from PlantUML
+      <br/>
+      Right-click on the PlantUML file or Alt-Insert -> Generate -> Generate DDL from PlantUML.
+      <br/>
+      <a href="http://www.github.com/xwsg/plantuml2ddl">Source code</a> available on GitHub.
+    ]]></description>
+
+  <change-notes><![CDATA[
+      <ul>
+        <li>1.0.0 - First revision.</li>
+      </ul>
+    ]]>
+  </change-notes>
+    
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="173.0"/>
+    
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    -->
+    <depends>com.intellij.modules.lang</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+  </extensions>
+
+  <actions>
+      <action id="PlantUML2DDL" class="com.github.xwsg.plantuml.action.GenerateDdlAction"
+          text="Generate DDL from PlantUML" description="Generate DDL from PlantUML">
+        <add-to-group group-id="GenerateGroup" anchor="last"/>
+      </action>
+  </actions>
+
+</idea-plugin>
