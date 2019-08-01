@@ -1,5 +1,5 @@
 # PlantUML2DDL
-Generate DDL from PlantUML
+Generate DDL from PlantUML [Entity Relationship Diagram](http://plantuml.com/zh/ie-diagram)
 
 ## Usage
 1. Install the plugin in Intellij Idea
@@ -8,6 +8,14 @@ Generate DDL from PlantUML
 
 The plugin will generate a {PlantUML file}.sql file in the same directory.
 
+## Defining Symbol
+Symbol| Explain
+------|-----
+# | PRIMARY KEY
+* | NOT NULL
+<\<generated>> | AUTO_INCREMENT
+
+## Example
 For example: `mall.puml`
 
 ```
@@ -29,7 +37,7 @@ entity "tbl_user" as user {
 entity "tbl_order" as order {
   #id : bigint(20) <<generated>>
   --
-  *order_number : varchar(20)
+  * **order_number** : varchar(20)
   *user_id : bigint(20) <<FK>>
   *item_id: bigint(20) <<FK>>
 }
@@ -50,22 +58,24 @@ item }|..|{ order
 Will generate a file `mall.sql`, content:
 ```
 CREATE TABLE IF NOT EXISTS `tbl_user` (
-  `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(50) NOT NULL,
-  `description` VARCHAR(200),
-  PRIMARY KEY (`id`)
+    `id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `name` varchar(50) NOT NULL,
+    `description` varchar(200),
+    PRIMARY KEY (`id`)
 );
+
 CREATE TABLE IF NOT EXISTS `tbl_order` (
-  `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
-  `order_number` VARCHAR(20) NOT NULL,
-  `user_id` BIGINT(20) NOT NULL,
-  `item_id:` <<FK>> NOT NULL,
-  PRIMARY KEY (`id`)
+    `id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `order_number` varchar(20) NOT NULL,
+    `user_id` bigint(20) NOT NULL,
+    `item_id` bigint(20) NOT NULL,
+    PRIMARY KEY (`id`)
 );
+
 CREATE TABLE IF NOT EXISTS `tbl_item` (
-  `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
-  `title` VARCHAR(50) NOT NULL,
-  `price` INT(11) NOT NULL,
-  PRIMARY KEY (`id`)
+    `id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `title` varchar(50) NOT NULL,
+    `price` int(11) NOT NULL,
+    PRIMARY KEY (`id`)
 );
 ```

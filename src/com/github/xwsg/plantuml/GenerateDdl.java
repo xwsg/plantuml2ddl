@@ -6,30 +6,43 @@ import java.io.Closeable;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 
 /**
- * This guy is lazy, nothing left.
+ * DDL generate tool.
  *
  * @author xwsg
  */
 public class GenerateDdl {
-
-    private final static String LINE_SEPARATOR = System.getProperty("line.separator");
+    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+    private static final Pattern START_ENTITY_REGEX_PATTERN = Pattern.compile("\\s*entity\\s*\"(\\S+)\".*\\{");
+    private static final Pattern FIELD_REGEX_PATTERN = Pattern.compile("\\s*([*#~+-]?)\\s*(\\S+)\\s*:\\s*(\\S+)\\s*(<<\\S+>>)*");
+    private static final String UML_START = "@startuml";
+    private static final String UML_END = "@enduml";
+    private static final String COLUMN_INDENT = "    ";
 
     public static void generate(VirtualFile plantUmlFile) {
         String filePath = "";
         if (plantUmlFile.getParent() != null) {
             filePath = plantUmlFile.getParent().getPath();
         }
-        String outFileName =
-            filePath + "/" + plantUmlFile.getName()
-                .substring(0, plantUmlFile.getName().lastIndexOf("."))
-                + ".sql";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        String nowString = LocalDateTime.now().format(formatter);
+        String ddlFileName = filePath + "/"
+            + plantUmlFile.getName().substring(0, plantUmlFile.getName().lastIndexOf("."))
+            + "-" + nowString + ".sql";
 
         String ddl = plantUml2Ddl(plantUmlFile);
-        if (ddl != null) {
-            writeToFile(ddl, outFileName);
+        if (ddl != null && !ddl.isEmpty()) {
+            writeToFile(ddl, ddlFileName);
+        } else {
+            JOptionPane.showMessageDialog(null, "PlantUML file not found!", "Generate Failed",
+                JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -40,87 +53,75 @@ public class GenerateDdl {
             inputStream = plantUmlFile.getInputStream();
             bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
-            boolean uml = false;
-            boolean field = false;
-            boolean firstField = false;
-            String pkField = null;
-
+            boolean matchedUml = false;
+            boolean matchedField = false;
+            boolean firstColumn = false;
+            String pkColumn = null;
             String lineText;
             StringBuilder ddlSb = new StringBuilder();
             while ((lineText = bufferedReader.readLine()) != null) {
-                lineText = lineText.trim();
-
+                // trim and exclude creole bold (**)
+                lineText = lineText.trim().replaceAll("\\*\\*", "");
                 if (lineText.isEmpty()) {
                     continue;
                 }
-                if (lineText.startsWith("@startuml")) {
-                    uml = true;
+                if (matchedUmlStart(lineText)) {
+                    matchedUml = true;
                     continue;
                 }
-                if (!uml) {
+                if (!matchedUml) {
                     continue;
                 }
-
-                if (lineText.startsWith("--") || lineText.startsWith("==") || lineText
-                    .startsWith("..") || lineText.startsWith("__")) {
+                if (matchedUmlEnd(lineText)) {
+                    matchedUml = false;
                     continue;
                 }
-
-                if (lineText.startsWith("@enduml")) {
-                    uml = false;
-                    continue;
-                }
-
-                if (field && lineText.startsWith("}")) {
-                    field = false;
-                    if (pkField != null) {
+                if (matchedField && matchedEntityEnd(lineText)) {
+                    matchedField = false;
+                    if (pkColumn != null) {
                         ddlSb.append(",").append(LINE_SEPARATOR);
-                        ddlSb.append("  ");
-                        ddlSb.append("PRIMARY KEY (`").append(pkField).append("`)");
-                        pkField = null;
+                        ddlSb.append(COLUMN_INDENT);
+                        ddlSb.append("PRIMARY KEY (`").append(pkColumn).append("`)");
+                        pkColumn = null;
                     }
-                    ddlSb.append(LINE_SEPARATOR).append(");").append(LINE_SEPARATOR);
+                    ddlSb.append(LINE_SEPARATOR).append(");").append(LINE_SEPARATOR)
+                        .append(LINE_SEPARATOR);
                     continue;
                 }
-
-                String[] lineArr = lineText.split("\\s+");
-                if (lineText.startsWith("entity")) {
-                    field = true;
-                    firstField = true;
-                    String tableName = lineArr[1].replaceAll("\"", "");
-                    ddlSb.append("CREATE TABLE IF NOT EXISTS ").append("`").append(tableName)
-                        .append("` (").append(LINE_SEPARATOR);
+                String tableName = extractTableName(lineText);
+                if (Objects.nonNull(tableName)) {
+                    matchedField = true;
+                    firstColumn = true;
+                    ddlSb.append("CREATE TABLE IF NOT EXISTS ");
+                    ddlSb.append("`").append(tableName).append("` (");
+                    ddlSb.append(LINE_SEPARATOR);
                     continue;
                 }
-
-                if (!field) {
+                if (!matchedField || matchedFieldSeparator(lineText)) {
                     continue;
                 }
-
-                if (!firstField) {
+                if (!firstColumn) {
                     ddlSb.append(",").append(LINE_SEPARATOR);
                 }
-                ddlSb.append("  ");
-                String fieldName = lineArr[0];
-                String fieldType = lineArr[2].toUpperCase();
-                if (fieldName.charAt(0) == '*') {
-                    fieldName = fieldName.substring(1);
-                    ddlSb.append("`").append(fieldName).append("` ").append(fieldType)
-                        .append(" NOT NULL");
-                } else if (fieldName.charAt(0) == '#') {
-                    fieldName = fieldName.substring(1);
-                    ddlSb.append("`").append(fieldName).append("` ").append(fieldType)
-                        .append(" NOT NULL");
-                    pkField = fieldName;
-                } else {
-                    ddlSb.append("`").append(fieldName).append("` ").append(fieldType);
+                // column indent
+                ddlSb.append(COLUMN_INDENT);
+                Column column = extractColumn(lineText);
+                if (Objects.nonNull(column)) {
+                    ddlSb.append("`").append(column.getName()).append("` ")
+                        .append(column.getDataType());
+                    if (column.isNonNull()) {
+                        ddlSb.append(" NOT NULL");
+                    }
+                    if (column.isPrimaryKey()) {
+                        ddlSb.append(" NOT NULL");
+                        pkColumn = column.getName();
+                    }
+                    if (column.isAutoIncrement()) {
+                        ddlSb.append(" AUTO_INCREMENT");
+                    }
                 }
-                if (lineArr.length >= 4 && "<<generated>>".equals(lineArr[3])) {
-                    ddlSb.append(" AUTO_INCREMENT");
-                }
-                firstField = false;
+                firstColumn = false;
             }
-
             return ddlSb.toString();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Generate Failed",
@@ -128,6 +129,45 @@ public class GenerateDdl {
         } finally {
             safeClose(inputStream);
             safeClose(bufferedReader);
+        }
+        return null;
+    }
+
+    private static boolean matchedFieldSeparator(String lineText) {
+        return lineText.startsWith("--") || lineText.startsWith("==") || lineText
+            .startsWith("..") || lineText.startsWith("__");
+    }
+
+    private static boolean matchedUmlStart(String lineText) {
+        return UML_START.equals(lineText);
+    }
+
+    private static boolean matchedUmlEnd(String lineText) {
+        return UML_END.equals(lineText);
+    }
+
+    private static boolean matchedEntityEnd(String lineText) {
+        return "}".equals(lineText);
+    }
+
+    private static String extractTableName(String lineText) {
+        Matcher matcher = START_ENTITY_REGEX_PATTERN.matcher(lineText);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
+    }
+
+    private static Column extractColumn(String lineText) {
+        Matcher matcher = FIELD_REGEX_PATTERN.matcher(lineText);
+        if (matcher.find()) {
+            Column column = new Column();
+            column.setPrimaryKey("#".equals(matcher.group(1)));
+            column.setNonNull("*".equals(matcher.group(1)));
+            column.setName(matcher.group(2));
+            column.setDataType(matcher.group(3));
+            column.setAutoIncrement("<<generated>>".equals(matcher.group(4)));
+            return column;
         }
         return null;
     }
@@ -153,6 +193,55 @@ public class GenerateDdl {
             }
         } catch (Exception e) {
             // do nothing
+        }
+    }
+
+    private static class Column {
+
+        private String name;
+        private String dataType;
+        private boolean primaryKey;
+        private boolean autoIncrement;
+        private boolean nonNull;
+
+        String getName() {
+            return name;
+        }
+
+        void setName(String name) {
+            this.name = name;
+        }
+
+        String getDataType() {
+            return dataType;
+        }
+
+        void setDataType(String dataType) {
+            this.dataType = dataType;
+        }
+
+        boolean isPrimaryKey() {
+            return primaryKey;
+        }
+
+        void setPrimaryKey(boolean primaryKey) {
+            this.primaryKey = primaryKey;
+        }
+
+        boolean isAutoIncrement() {
+            return autoIncrement;
+        }
+
+        void setAutoIncrement(boolean autoIncrement) {
+            this.autoIncrement = autoIncrement;
+        }
+
+        boolean isNonNull() {
+            return nonNull;
+        }
+
+        void setNonNull(boolean nonNull) {
+            this.nonNull = nonNull;
         }
     }
 }
