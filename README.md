@@ -2,7 +2,7 @@
 Generate DDL from PlantUML [Entity Relationship Diagram](http://plantuml.com/zh/ie-diagram)
 
 ## Usage
-1. Install the plugin in Intellij Idea
+1. Install the plugin in Intellij Idea or install [plugin](plantuml2ddl.jar) from disk
 2. Open a PlantUML file
 3. Right-click on the PlantUML file or Alt-Insert -> Generate -> Generate DDL from PlantUML.
 

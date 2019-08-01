@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.github.xwsg</id>
   <name>PlantUML2DDL</name>
-  <version>1.0</version>
+  <version>1.0.1</version>
   <vendor email="xtremaplux@gmail.com" url="http://www.github.com/xwsg">Xwsg</vendor>
 
   <description><![CDATA[
