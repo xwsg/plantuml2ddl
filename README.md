@@ -11,8 +11,8 @@ The plugin will generate a {PlantUML file}.sql file in the same directory.
 ## Defining Symbol
 Symbol| Explain
 ------|-----
-# | PRIMARY KEY
-* | NOT NULL
+\# | PRIMARY KEY
+\* | NOT NULL
 <\<generated>> | AUTO_INCREMENT
 
 ## Example
