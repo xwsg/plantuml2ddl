@@ -1,5 +1,5 @@
 # PlantUML2DDL
-Generate DDL from PlantUML [Entity Relationship Diagram](http://plantuml.com/zh/ie-diagram)
+Generate DDL(**Now only support Mysql**) from PlantUML [Entity Relationship Diagram](http://plantuml.com/zh/ie-diagram)
 
 ## Usage
 1. Install the plugin in Intellij Idea or install [plugin](plantuml2ddl.jar) from disk
