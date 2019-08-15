@@ -55,6 +55,8 @@ item }|..|{ order
 @enduml
 ```
 
+![plantuml2ddl](plantuml2ddl.gif)
+
 Will generate a file `mall.sql`, content:
 ```
 CREATE TABLE IF NOT EXISTS `tbl_user` (

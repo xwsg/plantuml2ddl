@@ -1,0 +1,34 @@
+@startuml
+
+' hide the spot
+hide circle
+
+' avoid problems with angled crows feet
+skinparam linetype ortho
+
+entity "tbl_user" as user {
+  #id : bigint(20) <<generated>>
+  --
+  *name : varchar(50)
+  description : varchar(200)
+}
+
+entity "tbl_order" as order {
+  #id : bigint(20) <<generated>>
+  --
+  * **order_number** : varchar(20)
+  *user_id : bigint(20) <<FK>>
+  *item_id: bigint(20) <<FK>>
+}
+
+entity "tbl_item" as item {
+  #id : bigint(20)  <<generated>>
+  --
+  *title : varchar(50)
+  *price : int(11)
+}
+
+user }|..|{ order
+item }|..|{ order
+
+@enduml
