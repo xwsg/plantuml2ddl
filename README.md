@@ -14,6 +14,10 @@ Symbol| Explain
 \# | PRIMARY KEY
 \* | NOT NULL
 <\<generated>> | AUTO_INCREMENT
+<\<notnull>> | NOT NULL
+<\<default:{DEFAULT_VALUE}>> | DEFAULT {DEFAULT_VALUE}
+--{COLUMN_COMMENT} | column COMMENT '{COLUMN_COMMENT}'
+{TABLE_COMMENT} <br> --/../==/__ | table COMMENT '{TABLE_COMMENT}'
 
 ## Example
 For example: `mall.puml`
@@ -28,25 +32,32 @@ hide circle
 skinparam linetype ortho
 
 entity "tbl_user" as user {
+  用户表
+  --
   #id : bigint(20) <<generated>>
   --
-  *name : varchar(50)
-  description : varchar(200)
+  *type : tinyint(4) <<default:0>> --用户类型：0-PC用户,1-移动端用户
+  *name : varchar(50) <<default:'anonymous'>> --用户名
+  description : varchar(200) <<default:'some string'>> --用户描述
 }
 
 entity "tbl_order" as order {
+  订单表
+  ==
   #id : bigint(20) <<generated>>
   --
-  * **order_number** : varchar(20)
-  *user_id : bigint(20) <<FK>>
-  *item_id: bigint(20) <<FK>>
+  * **order_number** : varchar(20)  <<default:'0'>> -- 订单号
+  *user_id : bigint(20) <<FK>> <<default:0>> -- 用户id
+  *item_id: bigint(20) <<FK>> <<default:0>> -- 商品id
 }
 
 entity "tbl_item" as item {
+  商品表
+  ..
   #id : bigint(20)  <<generated>>
   --
-  *title : varchar(50)
-  *price : int(11)
+  title : varchar(50)  <<default: 'wahaha'>> <<notnull>> -- 商品标题
+  *price : int(11) <<default: 0>> -- 商品价格
 }
 
 user }|..|{ order
@@ -57,27 +68,28 @@ item }|..|{ order
 
 ![plantuml2ddl](plantuml2ddl.gif)
 
-Will generate a file `mall.sql`, content:
+Will generate a file `mall-{yyyyMMddHHmmss}.sql`, content:
 ```
 CREATE TABLE IF NOT EXISTS `tbl_user` (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `name` varchar(50) NOT NULL,
-    `description` varchar(200),
+    `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `type` TINYINT(4) NOT NULL DEFAULT 0 COMMENT '用户类型：0-PC用户,1-移动端用户',
+    `name` VARCHAR(50) NOT NULL DEFAULT 'anonymous' COMMENT '用户名',
+    `description` VARCHAR(200) DEFAULT 'some string' COMMENT '用户描述',
     PRIMARY KEY (`id`)
-);
+) COMMENT '用户表';
 
 CREATE TABLE IF NOT EXISTS `tbl_order` (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `order_number` varchar(20) NOT NULL,
-    `user_id` bigint(20) NOT NULL,
-    `item_id` bigint(20) NOT NULL,
+    `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `order_number` VARCHAR(20) NOT NULL DEFAULT '0' COMMENT '订单号',
+    `user_id` BIGINT(20) NOT NULL DEFAULT 0 COMMENT '用户id',
+    `item_id` BIGINT(20) NOT NULL DEFAULT 0 COMMENT '商品id',
     PRIMARY KEY (`id`)
-);
+) COMMENT '订单表';
 
 CREATE TABLE IF NOT EXISTS `tbl_item` (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `title` varchar(50) NOT NULL,
-    `price` int(11) NOT NULL,
+    `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `title` VARCHAR(50) NOT NULL DEFAULT 'wahaha' COMMENT '商品标题',
+    `price` INT(11) NOT NULL DEFAULT 0 COMMENT '商品价格',
     PRIMARY KEY (`id`)
-);
+) COMMENT '商品表';
 ```

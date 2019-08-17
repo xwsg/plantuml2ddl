@@ -6,6 +6,8 @@ import java.io.Closeable;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -19,12 +21,19 @@ import javax.swing.JOptionPane;
  * @author xwsg
  */
 public class GenerateDdl {
+
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
     private static final Pattern START_ENTITY_REGEX_PATTERN = Pattern.compile("\\s*entity\\s*\"(\\S+)\".*\\{");
     private static final Pattern FIELD_REGEX_PATTERN = Pattern.compile("\\s*([*#~+-]?)\\s*(\\S+)\\s*:\\s*(\\S+)\\s*(<<\\S+>>)*");
     private static final String UML_START = "@startuml";
     private static final String UML_END = "@enduml";
     private static final String COLUMN_INDENT = "    ";
+
+    private static final String NOTNULL_MODIFIER = "<<notnull>>";
+    private static final String GENERATED_MODIFIER = "<<generated>>";
+    private static final Pattern DEFAULT_MODIFIER_PATTERN = Pattern.compile("<<default:([\\S+\\s]+?)>>");
+    private static final String COMMENT_MODIFIER = "--";
+    private static final Charset CHARSET = StandardCharsets.UTF_8;
 
     public static void generate(VirtualFile plantUmlFile) {
         String filePath = "";
@@ -51,12 +60,15 @@ public class GenerateDdl {
         BufferedReader bufferedReader = null;
         try {
             inputStream = plantUmlFile.getInputStream();
-            bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            bufferedReader = new BufferedReader(new InputStreamReader(inputStream, CHARSET));
 
             boolean matchedUml = false;
+            boolean matchedTable = false;
             boolean matchedField = false;
             boolean firstColumn = false;
             String pkColumn = null;
+            String guessTableComment = null;
+            String tableComment = null;
             String lineText;
             StringBuilder ddlSb = new StringBuilder();
             while ((lineText = bufferedReader.readLine()) != null) {
@@ -77,6 +89,7 @@ public class GenerateDdl {
                     continue;
                 }
                 if (matchedField && matchedEntityEnd(lineText)) {
+                    matchedTable = false;
                     matchedField = false;
                     if (pkColumn != null) {
                         ddlSb.append(",").append(LINE_SEPARATOR);
@@ -84,43 +97,47 @@ public class GenerateDdl {
                         ddlSb.append("PRIMARY KEY (`").append(pkColumn).append("`)");
                         pkColumn = null;
                     }
-                    ddlSb.append(LINE_SEPARATOR).append(");").append(LINE_SEPARATOR)
+                    ddlSb.append(LINE_SEPARATOR).append(")");
+                    if (tableComment != null && !tableComment.isEmpty()) {
+                        ddlSb.append(" COMMENT ").append("'").append(tableComment).append("'");
+                        tableComment = null;
+                    }
+                    ddlSb.append(";").append(LINE_SEPARATOR)
                         .append(LINE_SEPARATOR);
                     continue;
                 }
                 String tableName = extractTableName(lineText);
                 if (Objects.nonNull(tableName)) {
-                    matchedField = true;
+                    matchedTable = true;
                     firstColumn = true;
                     ddlSb.append("CREATE TABLE IF NOT EXISTS ");
                     ddlSb.append("`").append(tableName).append("` (");
                     ddlSb.append(LINE_SEPARATOR);
                     continue;
                 }
-                if (!matchedField || matchedFieldSeparator(lineText)) {
+                if (matchedFieldSeparator(lineText)) {
+                    if (matchedTable && !matchedField) {
+                        tableComment = guessTableComment;
+                        guessTableComment = null;
+                    }
                     continue;
                 }
-                if (!firstColumn) {
+                if (matchedField && !firstColumn) {
                     ddlSb.append(",").append(LINE_SEPARATOR);
                 }
-                // column indent
-                ddlSb.append(COLUMN_INDENT);
+
                 Column column = extractColumn(lineText);
-                if (Objects.nonNull(column)) {
-                    ddlSb.append("`").append(column.getName()).append("` ")
-                        .append(column.getDataType());
-                    if (column.isNonNull()) {
-                        ddlSb.append(" NOT NULL");
-                    }
-                    if (column.isPrimaryKey()) {
-                        ddlSb.append(" NOT NULL");
-                        pkColumn = column.getName();
-                    }
-                    if (column.isAutoIncrement()) {
-                        ddlSb.append(" AUTO_INCREMENT");
-                    }
+                if (column != null) {
+                    ddlSb.append(COLUMN_INDENT);
+                    ddlSb.append(column.getDefinition());
+                    pkColumn = column.isPk() ? column.getName() : pkColumn;
+                    matchedField = true;
+                    firstColumn = false;
+                    continue;
                 }
-                firstColumn = false;
+                if (matchedTable && !matchedField) {
+                    guessTableComment = lineText;
+                }
             }
             return ddlSb.toString();
         } catch (Exception ex) {
@@ -161,14 +178,37 @@ public class GenerateDdl {
     private static Column extractColumn(String lineText) {
         Matcher matcher = FIELD_REGEX_PATTERN.matcher(lineText);
         if (matcher.find()) {
+            StringBuilder columnSb = new StringBuilder();
             Column column = new Column();
-            column.setPrimaryKey("#".equals(matcher.group(1)));
-            column.setNonNull("*".equals(matcher.group(1)));
-            column.setName(matcher.group(2));
-            column.setDataType(matcher.group(3));
-            column.setAutoIncrement("<<generated>>".equals(matcher.group(4)));
+            String columnName = matcher.group(2);
+            String dataType = matcher.group(3).toUpperCase();
+            boolean primaryKey = "#".equals(matcher.group(1));
+            boolean nonNull = "*".equals(matcher.group(1)) || lineText.contains(NOTNULL_MODIFIER);
+            boolean autoIncrement = lineText.contains(GENERATED_MODIFIER);
+
+            columnSb.append("`").append(columnName).append("` ").append(dataType);
+            if (nonNull || primaryKey) {
+                columnSb.append(" NOT NULL");
+            }
+            if (primaryKey) {
+                column.setPk(true);
+                column.setName(columnName);
+            }
+            if (autoIncrement) {
+                columnSb.append(" AUTO_INCREMENT");
+            }
+            Matcher defaultMatcher = DEFAULT_MODIFIER_PATTERN.matcher(lineText);
+            if (defaultMatcher.find()) {
+                columnSb.append(" DEFAULT ").append(defaultMatcher.group(1).trim());
+            }
+            String[] commentArr = lineText.split(COMMENT_MODIFIER);
+            if (commentArr.length == 2) {
+                columnSb.append(" COMMENT ").append("'").append(commentArr[1].trim()).append("'");
+            }
+            column.setDefinition(columnSb.toString());
             return column;
         }
+
         return null;
     }
 
@@ -176,7 +216,7 @@ public class GenerateDdl {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(outFileName);
-            fos.write(content.getBytes());
+            fos.write(content.getBytes(CHARSET));
             fos.flush();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Generate Failed",
@@ -196,13 +236,19 @@ public class GenerateDdl {
         }
     }
 
-    private static class Column {
+    static class Column {
 
+        private boolean pk;
         private String name;
-        private String dataType;
-        private boolean primaryKey;
-        private boolean autoIncrement;
-        private boolean nonNull;
+        private String definition;
+
+        boolean isPk() {
+            return pk;
+        }
+
+        void setPk(boolean pk) {
+            this.pk = pk;
+        }
 
         String getName() {
             return name;
@@ -212,36 +258,12 @@ public class GenerateDdl {
             this.name = name;
         }
 
-        String getDataType() {
-            return dataType;
+        String getDefinition() {
+            return definition;
         }
 
-        void setDataType(String dataType) {
-            this.dataType = dataType;
-        }
-
-        boolean isPrimaryKey() {
-            return primaryKey;
-        }
-
-        void setPrimaryKey(boolean primaryKey) {
-            this.primaryKey = primaryKey;
-        }
-
-        boolean isAutoIncrement() {
-            return autoIncrement;
-        }
-
-        void setAutoIncrement(boolean autoIncrement) {
-            this.autoIncrement = autoIncrement;
-        }
-
-        boolean isNonNull() {
-            return nonNull;
-        }
-
-        void setNonNull(boolean nonNull) {
-            this.nonNull = nonNull;
+        void setDefinition(String definition) {
+            this.definition = definition;
         }
     }
 }
