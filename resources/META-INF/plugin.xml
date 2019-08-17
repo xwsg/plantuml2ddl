@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.github.xwsg</id>
   <name>PlantUML2DDL</name>
-  <version>1.0.1</version>
+  <version>1.1.0</version>
   <vendor email="xtremaplux@gmail.com" url="http://www.github.com/xwsg">Xwsg</vendor>
 
   <description><![CDATA[
@@ -14,6 +14,7 @@
 
   <change-notes><![CDATA[
       <ul>
+        <li>1.1.0 - Support table comment，column comment and column default modifier.</li>
         <li>1.0.1 - Exclude bold symbol; sql name add time.</li>
         <li>1.0.0 - First revision.</li>
       </ul>
