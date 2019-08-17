@@ -7,25 +7,32 @@ hide circle
 skinparam linetype ortho
 
 entity "tbl_user" as user {
+  用户表
+  --
   #id : bigint(20) <<generated>>
   --
-  *name : varchar(50)
-  description : varchar(200)
+  *type : tinyint(4) <<default:0>> --用户类型：0-PC用户,1-移动端用户
+  *name : varchar(50) <<default:'anonymous'>> --用户名
+  description : varchar(200) <<default:'some string'>> --用户描述
 }
 
 entity "tbl_order" as order {
+  订单表
+  ==
   #id : bigint(20) <<generated>>
   --
-  * **order_number** : varchar(20)
-  *user_id : bigint(20) <<FK>>
-  *item_id: bigint(20) <<FK>>
+  * **order_number** : varchar(20)  <<default:'0'>> -- 订单号
+  *user_id : bigint(20) <<FK>> <<default:0>> -- 用户id
+  *item_id: bigint(20) <<FK>> <<default:0>> -- 商品id
 }
 
 entity "tbl_item" as item {
+  商品表
+  ..
   #id : bigint(20)  <<generated>>
   --
-  *title : varchar(50)
-  *price : int(11)
+  title : varchar(50)  <<default: 'wahaha'>> <<notnull>> -- 商品标题
+  *price : int(11) <<default: 0>> -- 商品价格
 }
 
 user }|..|{ order
