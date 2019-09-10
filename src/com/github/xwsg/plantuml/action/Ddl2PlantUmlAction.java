@@ -1,6 +1,6 @@
 package com.github.xwsg.plantuml.action;
 
-import com.github.xwsg.plantuml.GenerateDdl;
+import com.github.xwsg.plantuml.Ddl2PlantUmlGenerator;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -17,21 +17,21 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author xwsg
  */
-public class GenerateDdlAction extends AnAction {
+public class Ddl2PlantUmlAction extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
-        VirtualFile plantUmlFile = e.getData(PlatformDataKeys.VIRTUAL_FILE);
+        VirtualFile ddlFile = e.getData(PlatformDataKeys.VIRTUAL_FILE);
         Project project = e.getData(PlatformDataKeys.PROJECT);
 
-        if (project != null && plantUmlFile != null) {
+        if (project != null && ddlFile != null) {
             // Show background process indicator
             ProgressManager
-                .getInstance().run(new Task.Backgroundable(project, "DDL Generation", false) {
+                .getInstance().run(new Task.Backgroundable(project, "PlantUml Generation", false) {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
                     // Generate DDLs
-                    GenerateDdl.generate(plantUmlFile);
+                    Ddl2PlantUmlGenerator.generate(ddlFile);
                     // refresh
                     VirtualFileManager.getInstance().asyncRefresh(null);
                 }
