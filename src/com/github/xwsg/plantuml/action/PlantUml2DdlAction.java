@@ -1,6 +1,6 @@
 package com.github.xwsg.plantuml.action;
 
-import com.github.xwsg.plantuml.GenerateDdl;
+import com.github.xwsg.plantuml.generator.PlantUml2DdlGenerator;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -13,11 +13,11 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Generate DDL from PlantUML Action.
+ * Generate PlantUML from DDL Action.
  *
  * @author xwsg
  */
-public class GenerateDdlAction extends AnAction {
+public class PlantUml2DdlAction extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
@@ -31,7 +31,7 @@ public class GenerateDdlAction extends AnAction {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
                     // Generate DDLs
-                    GenerateDdl.generate(plantUmlFile);
+                    PlantUml2DdlGenerator.generate(plantUmlFile);
                     // refresh
                     VirtualFileManager.getInstance().asyncRefresh(null);
                 }

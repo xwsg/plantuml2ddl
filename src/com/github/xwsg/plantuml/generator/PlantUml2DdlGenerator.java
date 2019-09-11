@@ -1,13 +1,10 @@
-package com.github.xwsg.plantuml;
+package com.github.xwsg.plantuml.generator;
 
+import com.github.xwsg.plantuml.util.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.io.BufferedReader;
-import java.io.Closeable;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -20,7 +17,7 @@ import javax.swing.JOptionPane;
  *
  * @author xwsg
  */
-public class GenerateDdl {
+public class PlantUml2DdlGenerator {
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
     private static final Pattern START_ENTITY_REGEX_PATTERN = Pattern.compile("\\s*entity\\s*\"(\\S+)\".*\\{");
@@ -33,7 +30,8 @@ public class GenerateDdl {
     private static final String GENERATED_MODIFIER = "<<generated>>";
     private static final Pattern DEFAULT_MODIFIER_PATTERN = Pattern.compile("<<default:([\\S+\\s]+?)>>");
     private static final String COMMENT_MODIFIER = "--";
-    private static final Charset CHARSET = StandardCharsets.UTF_8;
+
+    private static final String PK_MODIFIER = "<<pk>>";
 
     public static void generate(VirtualFile plantUmlFile) {
         String filePath = "";
@@ -48,7 +46,7 @@ public class GenerateDdl {
 
         String ddl = plantUml2Ddl(plantUmlFile);
         if (ddl != null && !ddl.isEmpty()) {
-            writeToFile(ddl, ddlFileName);
+            FileUtil.writeToFile(ddl, ddlFileName);
         } else {
             JOptionPane.showMessageDialog(null, "PlantUML file not found!", "Generate Failed",
                 JOptionPane.ERROR_MESSAGE);
@@ -60,7 +58,7 @@ public class GenerateDdl {
         BufferedReader bufferedReader = null;
         try {
             inputStream = plantUmlFile.getInputStream();
-            bufferedReader = new BufferedReader(new InputStreamReader(inputStream, CHARSET));
+            bufferedReader = new BufferedReader(new InputStreamReader(inputStream, FileUtil.CHARSET));
 
             boolean matchedUml = false;
             boolean matchedTable = false;
@@ -82,6 +80,9 @@ public class GenerateDdl {
                     continue;
                 }
                 if (!matchedUml) {
+                    continue;
+                }
+                if (matchedComment(lineText)) {
                     continue;
                 }
                 if (matchedUmlEnd(lineText)) {
@@ -144,8 +145,8 @@ public class GenerateDdl {
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Generate Failed",
                 JOptionPane.ERROR_MESSAGE);
         } finally {
-            safeClose(inputStream);
-            safeClose(bufferedReader);
+            FileUtil.safeClose(inputStream);
+            FileUtil.safeClose(bufferedReader);
         }
         return null;
     }
@@ -153,6 +154,10 @@ public class GenerateDdl {
     private static boolean matchedFieldSeparator(String lineText) {
         return lineText.startsWith("--") || lineText.startsWith("==") || lineText
             .startsWith("..") || lineText.startsWith("__");
+    }
+
+    private static boolean matchedComment(String lineText) {
+        return lineText.startsWith("'");
     }
 
     private static boolean matchedUmlStart(String lineText) {
@@ -182,9 +187,9 @@ public class GenerateDdl {
             Column column = new Column();
             String columnName = matcher.group(2);
             String dataType = matcher.group(3).toUpperCase();
-            boolean primaryKey = "#".equals(matcher.group(1));
-            boolean nonNull = "*".equals(matcher.group(1)) || lineText.contains(NOTNULL_MODIFIER);
-            boolean autoIncrement = lineText.contains(GENERATED_MODIFIER);
+            boolean primaryKey = "#".equals(matcher.group(1)) || lineText.toLowerCase().contains(PK_MODIFIER);
+            boolean nonNull = "*".equals(matcher.group(1)) || lineText.toLowerCase().contains(NOTNULL_MODIFIER);
+            boolean autoIncrement = lineText.toLowerCase().contains(GENERATED_MODIFIER);
 
             columnSb.append("`").append(columnName).append("` ").append(dataType);
             if (nonNull || primaryKey) {
@@ -210,30 +215,6 @@ public class GenerateDdl {
         }
 
         return null;
-    }
-
-    private static void writeToFile(String content, String outFileName) {
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(outFileName);
-            fos.write(content.getBytes(CHARSET));
-            fos.flush();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, ex.getMessage(), "Generate Failed",
-                JOptionPane.ERROR_MESSAGE);
-        } finally {
-            safeClose(fos);
-        }
-    }
-
-    private static void safeClose(Closeable closeable) {
-        try {
-            if (closeable != null) {
-                closeable.close();
-            }
-        } catch (Exception e) {
-            // do nothing
-        }
     }
 
     static class Column {
