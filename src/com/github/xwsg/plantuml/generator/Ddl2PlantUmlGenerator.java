@@ -1,5 +1,6 @@
-package com.github.xwsg.plantuml;
+package com.github.xwsg.plantuml.generator;
 
+import com.github.xwsg.plantuml.util.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -17,7 +18,7 @@ import javax.swing.JOptionPane;
 /**
  * PlantUml generate tool.
  *
- * @author wsg
+ * @author xwsg
  */
 public class Ddl2PlantUmlGenerator {
 
@@ -27,7 +28,7 @@ public class Ddl2PlantUmlGenerator {
     private static final String COLUMN_INDENT = "    ";
     private static final Pattern TABLE_REGEX_PATTERN = Pattern.compile("\\s*CREATE\\s+TABLE(\\s+IF\\s+NOT\\s+EXISTS)?\\s+(\\S+)\\s*\\(", Pattern.CASE_INSENSITIVE);
     private static final Pattern END_TABLE_REGEX_PATTERN = Pattern.compile("^\\s*\\)");
-    private static final Pattern TABLE_COMMENT_REGEX_PATTERN = Pattern.compile("COMMENT\\s*=\\s*('(.*?)')?", Pattern.CASE_INSENSITIVE);
+    private static final Pattern TABLE_COMMENT_REGEX_PATTERN = Pattern.compile("COMMENT(\\s*=\\s*|\\s+)('(.*?)')?", Pattern.CASE_INSENSITIVE);
     private static final Pattern COLUMN_REGEX_PATTERN = Pattern.compile("\\s*(\\S+)\\s+(\\S+(\\s*\\(\\d+\\))?)");
     private static final Pattern COLUMN_AUTO_INCREMENT_REGEX_PATTERN = Pattern.compile("\\s+AUTO_INCREMENT", Pattern.CASE_INSENSITIVE);
     private static final Pattern COLUMN_DEFAULT_REGEX_PATTERN = Pattern.compile("\\s+DEFAULT\\s+('.*?'|\\d+|([\\w|_]+(\\(\\d+\\))?))", Pattern.CASE_INSENSITIVE);
@@ -239,7 +240,7 @@ public class Ddl2PlantUmlGenerator {
     private static String extractTableComment(String lineText) {
         Matcher tblCommentMatcher = TABLE_COMMENT_REGEX_PATTERN.matcher(lineText);
         if (tblCommentMatcher.find()) {
-            return tblCommentMatcher.group(2);
+            return tblCommentMatcher.group(3);
         }
         return null;
     }
@@ -305,7 +306,6 @@ public class Ddl2PlantUmlGenerator {
         private String comment;
         private String defaultValue;
         private boolean notNull;
-        private boolean pk;
         private boolean autoIncrement;
 
         String getName() {
@@ -346,14 +346,6 @@ public class Ddl2PlantUmlGenerator {
 
         void setNotNull(boolean notNull) {
             this.notNull = notNull;
-        }
-
-        boolean isPk() {
-            return pk;
-        }
-
-        void setPk(boolean pk) {
-            this.pk = pk;
         }
 
         boolean isAutoIncrement() {

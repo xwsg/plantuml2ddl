@@ -1,4 +1,4 @@
-package com.github.xwsg.plantuml;
+package com.github.xwsg.plantuml.util;
 
 import java.io.Closeable;
 import java.io.FileOutputStream;
@@ -9,13 +9,13 @@ import javax.swing.JOptionPane;
 /**
  * This guy is lazy, nothing left.
  *
- * @author wsg
+ * @author xwsg
  */
 public class FileUtil {
 
-    static final Charset CHARSET = StandardCharsets.UTF_8;
+    public static final Charset CHARSET = StandardCharsets.UTF_8;
 
-    static void writeToFile(String content, String outFileName) {
+    public static void writeToFile(String content, String outFileName) {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(outFileName);
@@ -29,7 +29,7 @@ public class FileUtil {
         }
     }
 
-    static void safeClose(Closeable closeable) {
+    public static void safeClose(Closeable closeable) {
         try {
             if (closeable != null) {
                 closeable.close();

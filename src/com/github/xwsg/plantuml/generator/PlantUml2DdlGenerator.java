@@ -1,5 +1,6 @@
-package com.github.xwsg.plantuml;
+package com.github.xwsg.plantuml.generator;
 
+import com.github.xwsg.plantuml.util.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -99,7 +100,7 @@ public class PlantUml2DdlGenerator {
                     }
                     ddlSb.append(LINE_SEPARATOR).append(")");
                     if (tableComment != null && !tableComment.isEmpty()) {
-                        ddlSb.append(" COMMENT=").append("'").append(tableComment).append("'");
+                        ddlSb.append(" COMMENT ").append("'").append(tableComment).append("'");
                         tableComment = null;
                     }
                     ddlSb.append(";").append(LINE_SEPARATOR)

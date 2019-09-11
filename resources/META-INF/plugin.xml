@@ -7,15 +7,15 @@
   <description><![CDATA[
       PlantUML DDL Converter
       <br/>
-      Right-click on the PlantUML file or Alt-Insert -> Generate -> 'PlantUML -> DDL'.
-      Right-click on the DDL file or Alt-Insert -> Generate -> 'DDL -> PlantUML'.
+      Convert PlantUML to DDL: Right-click in the PlantUML file or Alt-Insert -> Generate -> 'PlantUML -> DDL'.
+      Convert DDL to PlantUML: Right-click in the DDL file or Alt-Insert -> Generate -> 'DDL -> PlantUML'.
       <br/>
       <a href="http://www.github.com/xwsg/plantuml2ddl">Source code</a> available on GitHub.
     ]]></description>
 
   <change-notes><![CDATA[
       <ul>
-        <li>1.2.0 - Support DDL -> PlantUML.</li>
+        <li>1.2.0 - Support convert DDL to PlantUML.</li>
         <li>1.1.0 - Support table comment，column comment and column default modifier.</li>
         <li>1.0.1 - Exclude bold symbol; sql name add time.</li>
         <li>1.0.0 - First revision.</li>
@@ -38,11 +38,11 @@
 
   <actions>
       <action id="PlantUML2DDL" class="com.github.xwsg.plantuml.action.PlantUml2DdlAction"
-          text="PlantUML -> DDL" description="Generate DDL from PlantUML">
+          text="PlantUML -> DDL" description="Convert PlantUML to DDL">
         <add-to-group group-id="GenerateGroup" anchor="last"/>
       </action>
       <action id="DDL2PlantUML" class="com.github.xwsg.plantuml.action.Ddl2PlantUmlAction"
-              text="DDL -> PlantUML" description="Generate PlantUML from DDL">
+              text="DDL -> PlantUML" description="Convert DDL to PlantUML">
         <add-to-group group-id="GenerateGroup" anchor="last"/>
       </action>
   </actions>

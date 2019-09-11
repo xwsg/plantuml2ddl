@@ -1,6 +1,6 @@
 package com.github.xwsg.plantuml.action;
 
-import com.github.xwsg.plantuml.Ddl2PlantUmlGenerator;
+import com.github.xwsg.plantuml.generator.Ddl2PlantUmlGenerator;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
