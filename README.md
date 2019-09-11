@@ -17,10 +17,7 @@ Symbol| Explain | Example
 {TABLE_COMMENT} <br> --/../==/__ | table COMMENT '{TABLE_COMMENT}' | entity "tbl_user" { <br> &nbsp;&nbsp;`用户表` <br> &nbsp;&nbsp;`--` <br> } <br> entity "tbl_user" { <br> &nbsp;&nbsp;`用户表` <br> &nbsp;&nbsp;`..` <br> } <br> entity "tbl_user" { <br> &nbsp;&nbsp;`用户表` <br> &nbsp;&nbsp;`==` <br> }  <br> entity "tbl_user"  { <br> &nbsp;&nbsp;`用户表` <br> &nbsp;&nbsp;`__` <br> }
 
 ## Usage
-- [Convert PlantUML to DDL](#PlantUML2DDL)
-- [Convert DDL to PlantUML](#DDL2PlantUML)
-
-### <span id="PlantUML2DDL">Convert PlantUML to DDL</span>
+### Convert PlantUML to DDL
 1. Open a PlantUML file
 2. In this file, Right-click or Alt-Insert
 3. Select `Generate` -> `PlantUML -> DDL`.
@@ -99,7 +96,7 @@ CREATE TABLE IF NOT EXISTS `tbl_item` (
 ) COMMENT '商品表';
 ```
 
-### <span id="DDL2PlantUML">Convert DDL to PlantUML</span>
+### Convert DDL to PlantUML
 1. Open a DDL file
 2. In this file, Right-click or Alt-Insert
 3. Select `Generate` -> `DDL -> PlantUMLL`.
