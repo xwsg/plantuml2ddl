@@ -1,27 +1,31 @@
 # PlantUML2DDL
-Intellij IDEA plugin [PlantUML2DDL](https://plugins.jetbrains.com/plugin/12801-plantuml2ddl) for generate DDL(**Now only support MySQL**) from PlantUML [Entity Relationship Diagram](http://plantuml.com/zh/ie-diagram)
+Intellij IDEA plugin [PlantUML2DDL](https://plugins.jetbrains.com/plugin/12801-plantuml2ddl) for Mysql DDL and PlantUML [Entity Relationship Diagram](http://plantuml.com/zh/ie-diagram) convert to each other. 
 
-## Usage
-1. Install the plugin in Intellij Idea or install [plugin](https://github.com/xwsg/plantuml2ddl/releases) from disk
-2. Open a PlantUML file
-3. Right-click on the PlantUML file or Alt-Insert -> Generate -> Generate DDL from PlantUML.
-
-The plugin will generate a {PlantUML file}.sql file in the same directory.
+## Installation
+Install this plugin both from plugin marketplace and from disk [releases](https://github.com/xwsg/plantuml2ddl/releases)
 
 ## Defining Symbol
-Symbol| Explain
-------|-----
-\# | PRIMARY KEY
-\* | NOT NULL
-<\<generated>> | AUTO_INCREMENT
-<\<notnull>> | NOT NULL
-<\<default:{DEFAULT_VALUE}>> | DEFAULT {DEFAULT_VALUE}
---{COLUMN_COMMENT} | column COMMENT '{COLUMN_COMMENT}'
-{TABLE_COMMENT} <br> --/../==/__ | table COMMENT '{TABLE_COMMENT}'
+Symbol| Explain | Example
+------|-----|-----
+\# | PRIMARY KEY | `#`id : bigint(20)
+<\<pk>> | PRIMARY KEY | id : bigint(20) `<<pk>>`
+\* | NOT NULL | `*`type : tinyint(4)
+<\<notnull>> | NOT NULL | type : tinyint(4) `<<notnull>>`
+<\<generated>> | AUTO_INCREMENT | #id : bigint(20) `<<generated>>`
+<\<default:{DEFAULT_VALUE}>> | DEFAULT {DEFAULT_VALUE} | *name : varchar(50) `<<default:'anonymous'>>` <br> type : tinyint(4) `<<default:0>>`
+--{COLUMN_COMMENT} | column COMMENT '{COLUMN_COMMENT}' | *name : varchar(50) <\<default:'anonymous'>> `--用户名`
+{TABLE_COMMENT} <br> --/../==/__ | table COMMENT '{TABLE_COMMENT}' | entity "tbl_user" { <br> &nbsp;&nbsp;`用户表` <br> &nbsp;&nbsp;`--` <br> } <br> entity "tbl_user" { <br> &nbsp;&nbsp;`用户表` <br> &nbsp;&nbsp;`..` <br> } <br> entity "tbl_user" { <br> &nbsp;&nbsp;`用户表` <br> &nbsp;&nbsp;`==` <br> }  <br> entity "tbl_user"  { <br> &nbsp;&nbsp;`用户表` <br> &nbsp;&nbsp;`__` <br> }
 
-## Example
+## Usage
+- [Convert PlantUML to DDL](#PlantUML2DDL)
+- [Convert DDL to PlantUML](#DDL2PlantUML)
+
+### <span id="PlantUML2DDL">Convert PlantUML to DDL</span>
+1. Open a PlantUML file
+2. In this file, Right-click or Alt-Insert
+3. Select `Generate` -> `PlantUML -> DDL`.
+
 For example: `mall.puml`
-
 ```
 @startuml
 
@@ -68,7 +72,8 @@ item }|..|{ order
 
 ![plantuml2ddl](plantuml2ddl.gif)
 
-Will generate a file `mall-{yyyyMMddHHmmss}.sql`, content:
+In the same directory, will generate a file `mall-{yyyyMMddHHmmss}.sql`:
+
 ```
 CREATE TABLE IF NOT EXISTS `tbl_user` (
     `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
@@ -93,3 +98,8 @@ CREATE TABLE IF NOT EXISTS `tbl_item` (
     PRIMARY KEY (`id`)
 ) COMMENT '商品表';
 ```
+
+### <span id="DDL2PlantUML">Convert DDL to PlantUML</span>
+1. Open a DDL file
+2. In this file, Right-click or Alt-Insert
+3. Select `Generate` -> `DDL -> PlantUMLL`.
