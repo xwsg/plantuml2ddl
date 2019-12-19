@@ -1,10 +1,10 @@
 package com.github.xwsg.plantuml.util;
 
+import javax.swing.JOptionPane;
 import java.io.Closeable;
 import java.io.FileOutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import javax.swing.JOptionPane;
 
 /**
  * This guy is lazy, nothing left.

@@ -1,6 +1,6 @@
 package com.github.xwsg.plantuml.action;
 
-import com.github.xwsg.plantuml.generator.PlantUml2DdlGenerator;
+import com.github.xwsg.plantuml.generator.Mysql2PlantUmlGenerator;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -13,25 +13,25 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Generate PlantUML from DDL Action.
+ * Generate DDL from PlantUML Action.
  *
  * @author xwsg
  */
-public class PlantUml2DdlAction extends AnAction {
+public class Mysql2PlantUmlAction extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
-        VirtualFile plantUmlFile = e.getData(PlatformDataKeys.VIRTUAL_FILE);
+        VirtualFile ddlFile = e.getData(PlatformDataKeys.VIRTUAL_FILE);
         Project project = e.getData(PlatformDataKeys.PROJECT);
 
-        if (project != null && plantUmlFile != null) {
+        if (project != null && ddlFile != null) {
             // Show background process indicator
             ProgressManager
-                .getInstance().run(new Task.Backgroundable(project, "DDL Generation", false) {
+                .getInstance().run(new Task.Backgroundable(project, "PlantUml Generation", false) {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
                     // Generate DDLs
-                    PlantUml2DdlGenerator.generate(plantUmlFile);
+                    Mysql2PlantUmlGenerator.generate(ddlFile);
                     // refresh
                     VirtualFileManager.getInstance().asyncRefresh(null);
                 }

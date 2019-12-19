@@ -2,6 +2,8 @@ package com.github.xwsg.plantuml.generator;
 
 import com.github.xwsg.plantuml.util.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+
+import javax.swing.JOptionPane;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -13,14 +15,13 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javax.swing.JOptionPane;
 
 /**
  * PlantUml generate tool.
  *
  * @author xwsg
  */
-public class Ddl2PlantUmlGenerator {
+public class Mysql2PlantUmlGenerator {
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
     private static final String UML_START = "@startuml";
