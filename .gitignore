@@ -31,3 +31,4 @@ build/
 ### VS Code ###
 .vscode/
 plantuml2ddl.jar
+!plantuml2ddl.iml
