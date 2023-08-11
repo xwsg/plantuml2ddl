@@ -32,3 +32,4 @@ build/
 .vscode/
 plantuml2ddl.jar
 plantuml2ddl.zip
+!plantuml2ddl.iml
