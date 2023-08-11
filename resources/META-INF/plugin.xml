@@ -2,7 +2,7 @@
   <id>com.github.xwsg</id>
   <name>PlantUML2DDL</name>
   <version>1.3.0</version>
-  <vendor email="xtremaplux@gmail.com" url="http://www.github.com/xwsg">xwsg</vendor>
+  <vendor email="xtremaplux@gmail.com" url="https://www.github.com/xwsg">xwsg</vendor>
 
   <description><![CDATA[
       PlantUML DDL Converter
@@ -10,7 +10,7 @@
       Convert PlantUML to MySQL/PostgreSQL DDL: Right-click in the PlantUML file or Alt-Insert -> Generate -> 'PlantUML -> MySQL/PostgreSQL'.
       Convert MySQL/PostgreSQL DDL to PlantUML: Right-click in the DDL file or Alt-Insert -> Generate -> 'MySQL/PostgreSQL -> PlantUML'.
       <br/>
-      <a href="http://www.github.com/xwsg/plantuml2ddl">Source code</a> available on GitHub.
+      <a href="https://www.github.com/xwsg/plantuml2ddl">Source code</a> available on GitHub.
     ]]></description>
 
   <change-notes><![CDATA[
