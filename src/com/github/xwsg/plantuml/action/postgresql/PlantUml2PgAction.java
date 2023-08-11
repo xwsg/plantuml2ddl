@@ -1,6 +1,6 @@
-package com.github.xwsg.plantuml.action;
+package com.github.xwsg.plantuml.action.postgresql;
 
-import com.github.xwsg.plantuml.generator.Ddl2PlantUmlGenerator;
+import com.github.xwsg.plantuml.generator.postgresql.PlantUml2PgDdlGenerator;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -13,25 +13,25 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Generate DDL from PlantUML Action.
+ *  Generate PostgreSQL DDL from PlantUML Action.
  *
  * @author xwsg
  */
-public class Ddl2PlantUmlAction extends AnAction {
+public class PlantUml2PgAction extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
-        VirtualFile ddlFile = e.getData(PlatformDataKeys.VIRTUAL_FILE);
+        VirtualFile plantUmlFile = e.getData(PlatformDataKeys.VIRTUAL_FILE);
         Project project = e.getData(PlatformDataKeys.PROJECT);
 
-        if (project != null && ddlFile != null) {
+        if (project != null && plantUmlFile != null) {
             // Show background process indicator
             ProgressManager
-                .getInstance().run(new Task.Backgroundable(project, "PlantUml Generation", false) {
+                    .getInstance().run(new Task.Backgroundable(project, "PlantUml2Pg generation", false) {
                 @Override
-                public void run(@NotNull ProgressIndicator indicator) {
+                public void run(ProgressIndicator indicator) {
                     // Generate DDLs
-                    Ddl2PlantUmlGenerator.generate(ddlFile);
+                    new PlantUml2PgDdlGenerator().generate(plantUmlFile);
                     // refresh
                     VirtualFileManager.getInstance().asyncRefresh(null);
                 }
@@ -41,6 +41,9 @@ public class Ddl2PlantUmlAction extends AnAction {
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        super.update(e);
+        VirtualFile vf = e.getData(PlatformDataKeys.VIRTUAL_FILE);
+        e.getPresentation().setVisible(vf != null &&
+            ("PlantUML file".equalsIgnoreCase(vf.getFileType().getName())
+                || "PLAIN_TEXT".equalsIgnoreCase(vf.getFileType().getName())));
     }
 }

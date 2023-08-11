@@ -1,26 +1,26 @@
 # PlantUML2DDL
-Intellij IDEA 插件 [PlantUML2DDL](https://plugins.jetbrains.com/plugin/12801-plantuml2ddl) ，提供 Mysql DDL 和 PlantUML [Entity Relationship Diagram](http://plantuml.com/zh/ie-diagram) 互转功能. 
+Intellij IDEA 插件 [PlantUML2DDL](https://plugins.jetbrains.com/plugin/12801-plantuml2ddl) ，提供 MySQL/PostgreSQL DDL 和 PlantUML [Entity Relationship Diagram](http://plantuml.com/zh/ie-diagram) 互转功能. 
 
 ## 插件安装
 插件商城安装或手动从硬盘安装，下载地址： [releases](https://github.com/xwsg/plantuml2ddl/releases)
 
 ## 标签定义
-标签| 解释 | 示例
-------|-----|-----
-\# | PRIMARY KEY | `#`id : bigint(20)
-<\<pk>> | PRIMARY KEY | id : bigint(20) `<<pk>>`
-\* | NOT NULL | `*`type : tinyint(4)
-<\<notnull>> | NOT NULL | type : tinyint(4) `<<notnull>>`
-<\<generated>> | AUTO_INCREMENT | #id : bigint(20) `<<generated>>`
-<\<default:{DEFAULT_VALUE}>> | DEFAULT {DEFAULT_VALUE} | *name : varchar(50) `<<default:'anonymous'>>` <br> type : tinyint(4) `<<default:0>>`
---{COLUMN_COMMENT} | column COMMENT '{COLUMN_COMMENT}' | *name : varchar(50) <\<default:'anonymous'>> `--用户名`
-{TABLE_COMMENT} <br> --/../==/__ | table COMMENT '{TABLE_COMMENT}' | entity "tbl_user" { <br> &nbsp;&nbsp;`用户表` <br> &nbsp;&nbsp;`--` <br> } <br> entity "tbl_user" { <br> &nbsp;&nbsp;`用户表` <br> &nbsp;&nbsp;`..` <br> } <br> entity "tbl_user" { <br> &nbsp;&nbsp;`用户表` <br> &nbsp;&nbsp;`==` <br> }  <br> entity "tbl_user"  { <br> &nbsp;&nbsp;`用户表` <br> &nbsp;&nbsp;`__` <br> }
+| 标签                               | 解释                                | 示例                                                                                                                                                                                                                                                                                                               |
+|----------------------------------|-----------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| \#                               | PRIMARY KEY                       | `#`id : bigint(20)                                                                                                                                                                                                                                                                                               |
+| <\<pk>>                          | PRIMARY KEY                       | id : bigint(20) `<<pk>>`                                                                                                                                                                                                                                                                                         |
+| \*                               | NOT NULL                          | `*`type : tinyint(4)                                                                                                                                                                                                                                                                                             |
+| <\<notnull>>                     | NOT NULL                          | type : tinyint(4) `<<notnull>>`                                                                                                                                                                                                                                                                                  |
+| <\<generated>>                   | AUTO_INCREMENT                    | #id : bigint(20) `<<generated>>`                                                                                                                                                                                                                                                                                 |
+| <\<default:{DEFAULT_VALUE}>>     | DEFAULT {DEFAULT_VALUE}           | *name : varchar(50) `<<default:'anonymous'>>` <br> type : tinyint(4) `<<default:0>>`                                                                                                                                                                                                                             |
+| --{COLUMN_COMMENT}               | column COMMENT '{COLUMN_COMMENT}' | *name : varchar(50) <\<default:'anonymous'>> `--用户名`                                                                                                                                                                                                                                                             |
+| {TABLE_COMMENT} <br> --/../==/__ | table COMMENT '{TABLE_COMMENT}'   | entity "tbl_user" { <br> &nbsp;&nbsp;`用户表` <br> &nbsp;&nbsp;`--` <br> } <br> entity "tbl_user" { <br> &nbsp;&nbsp;`用户表` <br> &nbsp;&nbsp;`..` <br> } <br> entity "tbl_user" { <br> &nbsp;&nbsp;`用户表` <br> &nbsp;&nbsp;`==` <br> }  <br> entity "tbl_user"  { <br> &nbsp;&nbsp;`用户表` <br> &nbsp;&nbsp;`__` <br> } |
 
 ## 使用说明
 ### PlantUML 转 DDL
 1. 打开 PlantUML 文件
 2. 文件中, 右键或使用快捷键 Alt+Insert
-3. 选择 `Generate` -> `PlantUML -> DDL`.
+3. 选择  `Generate` -> `PlantUML -> MySQL` or `PlantUML -> PostgreSQL`.
 
 例如文件: `mall.puml`
 ```
@@ -69,7 +69,7 @@ item }|..|{ order
 
 ![plantuml2ddl](plantuml2ddl.gif)
 
-执行完成会在相同目录下生成 `mall-{yyyyMMddHHmmss}.sql` 文件，文件内容如下：
+执行完成会在相同目录下生成 `mall_{yyyyMMddHHmmss}.sql` 文件，文件内容如下：
 
 ```
 CREATE TABLE IF NOT EXISTS `tbl_user` (
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS `tbl_item` (
 ### DDL 转 PlantUML
 1. 打开 DDL 文件
 2. 文件中, 右键或使用快捷键 Alt+Insert
-3. 选择 `Generate` -> `DDL -> PlantUMLL`.
+3. 选择 `Generate` -> `MySQL -> PlantUML` or `PostgreSQL -> PlantUML`.
 
 ## 开发配置
 ### sdk配置

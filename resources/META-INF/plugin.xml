@@ -1,21 +1,22 @@
 <idea-plugin>
   <id>com.github.xwsg</id>
   <name>PlantUML2DDL</name>
-  <version>1.2.0</version>
-  <vendor email="xtremaplux@gmail.com" url="http://www.github.com/xwsg">Xwsg</vendor>
+  <version>1.3.0</version>
+  <vendor email="xtremaplux@gmail.com" url="http://www.github.com/xwsg">xwsg</vendor>
 
   <description><![CDATA[
       PlantUML DDL Converter
       <br/>
-      Convert PlantUML to DDL: Right-click in the PlantUML file or Alt-Insert -> Generate -> 'PlantUML -> DDL'.
-      Convert DDL to PlantUML: Right-click in the DDL file or Alt-Insert -> Generate -> 'DDL -> PlantUML'.
+      Convert PlantUML to MySQL/PostgreSQL DDL: Right-click in the PlantUML file or Alt-Insert -> Generate -> 'PlantUML -> MySQL/PostgreSQL'.
+      Convert MySQL/PostgreSQL DDL to PlantUML: Right-click in the DDL file or Alt-Insert -> Generate -> 'MySQL/PostgreSQL -> PlantUML'.
       <br/>
       <a href="http://www.github.com/xwsg/plantuml2ddl">Source code</a> available on GitHub.
     ]]></description>
 
   <change-notes><![CDATA[
       <ul>
-        <li>1.2.0 - Support convert DDL to PlantUML.</li>
+        <li>1.3.0 - Support PostgreSQL.</li>
+        <li>1.2.0 - Support MySQL</li>
         <li>1.1.0 - Support table comment，column comment and column default modifier.</li>
         <li>1.0.1 - Exclude bold symbol; sql name add time.</li>
         <li>1.0.0 - First revision.</li>
@@ -37,13 +38,21 @@
   </extensions>
 
   <actions>
-      <action id="PlantUML2DDL" class="com.github.xwsg.plantuml.action.PlantUml2DdlAction"
-          text="PlantUML -> DDL" description="Convert PlantUML to DDL">
-        <add-to-group group-id="GenerateGroup" anchor="last"/>
+      <action id="PlantUML2MySQL" class="com.github.xwsg.plantuml.action.mysql.PlantUml2MysqlAction"
+              text="PlantUML -> MySQL" description="Convert PlantUML to MySQL DDL">
+          <add-to-group group-id="GenerateGroup" anchor="last"/>
       </action>
-      <action id="DDL2PlantUML" class="com.github.xwsg.plantuml.action.Ddl2PlantUmlAction"
-              text="DDL -> PlantUML" description="Convert DDL to PlantUML">
-        <add-to-group group-id="GenerateGroup" anchor="last"/>
+      <action id="PlantUML2PostgreSQL" class="com.github.xwsg.plantuml.action.postgresql.PlantUml2PgAction"
+              text="PlantUML -> PostgreSQL" description="Convert PlantUML to PostgreSQL DDL">
+          <add-to-group group-id="GenerateGroup" anchor="last"/>
+      </action>
+      <action id="MySQL2PlantUML" class="com.github.xwsg.plantuml.action.mysql.Mysql2PlantUmlAction"
+              text="MySQL -> PlantUML" description="Convert MySQL DDL to PlantUML">
+          <add-to-group group-id="GenerateGroup" anchor="last"/>
+      </action>
+      <action id="PostgreSQL2PlantUML" class="com.github.xwsg.plantuml.action.postgresql.Pg2PlantUmlAction"
+              text="PostgreSQL -> PlantUML" description="Convert PostgreSQL DDL to PlantUML">
+          <add-to-group group-id="GenerateGroup" anchor="last"/>
       </action>
   </actions>
 

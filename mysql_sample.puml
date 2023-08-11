@@ -1,0 +1,41 @@
+@startuml aaa
+
+' hide the spot
+hide circle
+
+' avoid problems with angled crows feet
+skinparam linetype ortho
+
+entity "tbl_user" as user {
+  table for user
+  --
+  #id : bigint(20) <<generated>>
+  --
+  *type : tinyint(4) <<default:0>> --user type: 0-pc,1-mobile
+  *name : varchar(50) <<default:'anonymous'>> -- user name
+  description : varchar(200) <<default:'some string'>> --user description
+}
+
+entity "tbl_order" as order {
+  table for order
+  ==
+  #id : bigint(20) <<generated>>
+  --
+  * **order_number** : varchar(20)  <<default:'0'>> -- order number
+  *user_id : bigint(20) <<FK>> <<default:0>> -- user id
+  *item_id: bigint(20) <<FK>> <<default:0>> -- item id
+}
+
+entity "tbl_item" as item {
+  table for item
+  ..
+  #id : bigint(20)  <<generated>>
+  --
+  title : varchar(50)  <<default: 'wahaha'>> <<notnull>> -- item title
+  *price : int(11) <<default: 0>> -- item price
+}
+
+user }|..|{ order
+item }|..|{ order
+
+@enduml

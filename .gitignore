@@ -15,7 +15,7 @@ out/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
+#.idea
 *.iws
 *.iml
 *.ipr
@@ -31,4 +31,5 @@ build/
 ### VS Code ###
 .vscode/
 plantuml2ddl.jar
+plantuml2ddl.zip
 !plantuml2ddl.iml

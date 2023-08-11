@@ -1,0 +1,17 @@
+@startuml
+
+' hide the spot
+hide circle
+
+' avoid problems with angled crows feet
+skinparam linetype ortho
+
+entity "tbl_user" as user {
+  table for user
+  --
+  #id : bigserial <<generated>>
+  --
+  *name : varchar(100) <<default:''>> --user name
+  age : integer <<default:0>> -- user age
+}
+@enduml
