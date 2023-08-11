@@ -1,5 +1,6 @@
-package com.github.xwsg.plantuml.generator;
+package com.github.xwsg.plantuml.generator.mysql;
 
+import com.github.xwsg.plantuml.generator.AbstractDdlGenerator;
 import com.github.xwsg.plantuml.model.Column;
 import com.github.xwsg.plantuml.util.StringUtils;
 
@@ -14,7 +15,7 @@ public class PlantUml2MysqlDdlGenerator extends AbstractDdlGenerator {
     protected String genDdlText() {
         StringBuilder ddlSb = new StringBuilder();
         tables.forEach(tbl -> {
-            ddlSb.append("create table if not exists `").append(tbl.getName()).append("` (").append(LINE_SEPARATOR);
+            ddlSb.append("create table ").append(quote(tbl.getName())).append(" (").append(LINE_SEPARATOR);
             // only support first primary key column
             String pkClmName = null;
             int lineNo = 0;
@@ -24,7 +25,7 @@ public class PlantUml2MysqlDdlGenerator extends AbstractDdlGenerator {
                 }
                 lineNo++;
                 ddlSb.append(COLUMN_INDENT);
-                ddlSb.append("`").append(clm.getName()).append("` ").append(clm.getDataType());
+                ddlSb.append(quote(clm.getName())).append(" ").append(clm.getDataType());
                 if (clm.isNotNull() || clm.isPrimaryKey()) {
                     ddlSb.append(" not null");
                 }
@@ -43,7 +44,7 @@ public class PlantUml2MysqlDdlGenerator extends AbstractDdlGenerator {
             }
             if (StringUtils.isNotEmpty(pkClmName)) {
                 ddlSb.append(",").append(LINE_SEPARATOR);
-                ddlSb.append(COLUMN_INDENT).append("primary key (").append("`").append(pkClmName).append("`").append(")");
+                ddlSb.append(COLUMN_INDENT).append("primary key (").append(quote(pkClmName)).append(")");
                 ddlSb.append(LINE_SEPARATOR);
             }
             ddlSb.append(")");
@@ -53,5 +54,10 @@ public class PlantUml2MysqlDdlGenerator extends AbstractDdlGenerator {
             ddlSb.append(LINE_SEPARATOR).append(LINE_SEPARATOR);
         });
         return ddlSb.toString();
+    }
+
+    @Override
+    protected String quote(String str) {
+        return "`" + str + "`";
     }
 }

@@ -1,23 +1,23 @@
 # PlantUML2DDL
-Intellij IDEA plugin [PlantUML2DDL](https://plugins.jetbrains.com/plugin/12801-plantuml2ddl) for Mysql DDL and PlantUML [Entity Relationship Diagram](http://plantuml.com/zh/ie-diagram) convert to each other. 
+Intellij IDEA plugin [PlantUML2DDL](https://plugins.jetbrains.com/plugin/12801-plantuml2ddl) for MySQL/PostgreSQL DDL and PlantUML [Entity Relationship Diagram](http://plantuml.com/zh/ie-diagram) convert to each other. 
 
 ## Installation
 Install this plugin both from plugin marketplace and from disk. [Releases page](https://github.com/xwsg/plantuml2ddl/releases)
 
 ## Defining Symbol
-Symbol| Explain | Example
-------|-----|-----
-\# | PRIMARY KEY | `#`id : bigint(20)
-<\<pk>> | PRIMARY KEY | id : bigint(20) `<<pk>>`
-\* | NOT NULL | `*`type : tinyint(4)
-<\<notnull>> | NOT NULL | type : tinyint(4) `<<notnull>>`
-<\<generated>> | AUTO_INCREMENT | #id : bigint(20) `<<generated>>`
-<\<default:{DEFAULT_VALUE}>> | DEFAULT {DEFAULT_VALUE} | *name : varchar(50) `<<default:'anonymous'>>` <br> type : tinyint(4) `<<default:0>>`
---{COLUMN_COMMENT} | column COMMENT '{COLUMN_COMMENT}' | *name : varchar(50) <\<default:'anonymous'>> `--user name`
-{TABLE_COMMENT} <br> --/../==/__ | table COMMENT '{TABLE_COMMENT}' | entity "tbl_user" { <br> &nbsp;&nbsp;`table for user` <br> &nbsp;&nbsp;`--` <br> } <br> entity "tbl_user" { <br> &nbsp;&nbsp;`table for user` <br> &nbsp;&nbsp;`..` <br> } <br> entity "tbl_user" { <br> &nbsp;&nbsp;`table for user` <br> &nbsp;&nbsp;`==` <br> }  <br> entity "tbl_user"  { <br> &nbsp;&nbsp;`table for user` <br> &nbsp;&nbsp;`__` <br> }
+| Symbol                           | Explain                           | Example                                                                                                                                                                                                                                                                                                                                                      |
+|----------------------------------|-----------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| \#                               | PRIMARY KEY                       | `#`id : bigint(20)                                                                                                                                                                                                                                                                                                                                           |
+| <\<pk>>                          | PRIMARY KEY                       | id : bigint(20) `<<pk>>`                                                                                                                                                                                                                                                                                                                                     |
+| \*                               | NOT NULL                          | `*`type : tinyint(4)                                                                                                                                                                                                                                                                                                                                         |
+| <\<notnull>>                     | NOT NULL                          | type : tinyint(4) `<<notnull>>`                                                                                                                                                                                                                                                                                                                              |
+| <\<generated>>                   | AUTO_INCREMENT                    | #id : bigint(20) `<<generated>>`                                                                                                                                                                                                                                                                                                                             |
+| <\<default:{DEFAULT_VALUE}>>     | DEFAULT {DEFAULT_VALUE}           | *name : varchar(50) `<<default:'anonymous'>>` <br> type : tinyint(4) `<<default:0>>`                                                                                                                                                                                                                                                                         |
+| --{COLUMN_COMMENT}               | column COMMENT '{COLUMN_COMMENT}' | *name : varchar(50) <\<default:'anonymous'>> `--user name`                                                                                                                                                                                                                                                                                                   |
+| {TABLE_COMMENT} <br> --/../==/__ | table COMMENT '{TABLE_COMMENT}'   | entity "tbl_user" { <br> &nbsp;&nbsp;`table for user` <br> &nbsp;&nbsp;`--` <br> } <br> entity "tbl_user" { <br> &nbsp;&nbsp;`table for user` <br> &nbsp;&nbsp;`..` <br> } <br> entity "tbl_user" { <br> &nbsp;&nbsp;`table for user` <br> &nbsp;&nbsp;`==` <br> }  <br> entity "tbl_user"  { <br> &nbsp;&nbsp;`table for user` <br> &nbsp;&nbsp;`__` <br> } |
 
 ## Usage
-### Convert PlantUML to DDL (Support MySQL or PostgreSQL)
+### Convert PlantUML to DDL
 1. Open a PlantUML file
 2. In this file, Right-click or Alt-Insert
 3. Select `Generate` -> `PlantUML -> MySQL` or `PlantUML -> PostgreSQL`.
@@ -69,7 +69,7 @@ item }|..|{ order
 
 ![plantuml2ddl](plantuml2ddl.gif)
 
-In the current directory, will generate a file `mysql_sample-{yyyyMMddHHmmss}.sql`:
+In the current directory, will generate a file `mysql_sample_{yyyyMMddHHmmss}.sql`:
 
 ```
 create table if not exists `tbl_user` (
@@ -97,7 +97,7 @@ create table if not exists `tbl_item` (
 
 ```
 
-### Convert DDL to PlantUML (Only support MySQL)
+### Convert DDL to PlantUML
 1. Open a DDL file
 2. In this file, Right-click or Alt-Insert
-3. Select `Generate` -> `MySQL -> PlantUMLL`.
+3. Select `Generate` -> `MySQL -> PlantUML` or `PostgreSQL -> PlantUML`.

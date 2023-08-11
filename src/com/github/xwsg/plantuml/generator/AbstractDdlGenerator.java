@@ -5,7 +5,6 @@ import com.github.xwsg.plantuml.model.Table;
 import com.github.xwsg.plantuml.util.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 
-import javax.swing.JOptionPane;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JOptionPane;
 
 /**
  * Abstract DDL generator.
@@ -35,6 +35,7 @@ public abstract class AbstractDdlGenerator {
 
     protected static final String LINE_SEPARATOR = System.getProperty("line.separator");
     protected static final String COLUMN_INDENT = "    ";
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     protected List<Table> tables = new ArrayList<>();
 
@@ -43,17 +44,16 @@ public abstract class AbstractDdlGenerator {
         if (plantUmlFile.getParent() != null) {
             filePath = plantUmlFile.getParent().getPath();
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-        String nowString = LocalDateTime.now().format(formatter);
+        String nowString = LocalDateTime.now().format(DATE_TIME_FORMATTER);
         String ddlFileName = filePath + "/"
                 + plantUmlFile.getName().substring(0, plantUmlFile.getName().lastIndexOf("."))
-                + "-" + nowString + ".sql";
+                + "_" + nowString + ".sql";
 
         String ddl = plantUml2Ddl(plantUmlFile);
         if (ddl != null && !ddl.isEmpty()) {
             FileUtil.writeToFile(ddl, ddlFileName);
         } else {
-            JOptionPane.showMessageDialog(null, "PlantUML file not found!", "Generate Failed",
+            JOptionPane.showMessageDialog(null, "PlantUML file is empty!", "Generate Failed",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -137,6 +137,8 @@ public abstract class AbstractDdlGenerator {
      * @return ddl text
      */
     protected abstract String genDdlText();
+
+    protected abstract String quote(String str);
 
     private static boolean matchedFieldSeparator(String lineText) {
         return lineText.startsWith("--") || lineText.startsWith("==")
