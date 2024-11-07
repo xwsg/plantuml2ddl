@@ -1,6 +1,7 @@
 package com.github.xwsg.plantuml.action.mysql;
 
 import com.github.xwsg.plantuml.generator.mysql.MySQL2PlantUmlGenerator;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -44,5 +45,10 @@ public class Mysql2PlantUmlAction extends AnAction {
         VirtualFile vf = e.getData(PlatformDataKeys.VIRTUAL_FILE);
         e.getPresentation().setVisible(vf != null && "SQL".equalsIgnoreCase(vf.getFileType().getName()));
         super.update(e);
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }

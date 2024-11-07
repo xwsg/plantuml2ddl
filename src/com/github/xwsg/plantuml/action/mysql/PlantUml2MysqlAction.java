@@ -1,6 +1,7 @@
 package com.github.xwsg.plantuml.action.mysql;
 
 import com.github.xwsg.plantuml.generator.mysql.PlantUml2MysqlDdlGenerator;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -46,5 +47,10 @@ public class PlantUml2MysqlAction extends AnAction {
             ("PlantUML file".equalsIgnoreCase(vf.getFileType().getName())
                 || "PLAIN_TEXT".equalsIgnoreCase(vf.getFileType().getName())));
         super.update(e);
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }

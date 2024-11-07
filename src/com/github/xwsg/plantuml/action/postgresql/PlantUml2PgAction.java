@@ -1,6 +1,7 @@
 package com.github.xwsg.plantuml.action.postgresql;
 
 import com.github.xwsg.plantuml.generator.postgresql.PlantUml2PgDdlGenerator;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -45,5 +46,10 @@ public class PlantUml2PgAction extends AnAction {
         e.getPresentation().setVisible(vf != null &&
             ("PlantUML file".equalsIgnoreCase(vf.getFileType().getName())
                 || "PLAIN_TEXT".equalsIgnoreCase(vf.getFileType().getName())));
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }
